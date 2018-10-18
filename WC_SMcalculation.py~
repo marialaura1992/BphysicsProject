@@ -1,0 +1,50 @@
+import numpy as np
+from numpy import ma
+import matplotlib.pyplot as plt
+
+
+#Analytical expression for the WC C_1-C_10 in the decay B-> Xs l^+l^-
+#Mostly taken from Buras,Muenz  arXiv:hep-ph/9501281
+#The operator basis is the same as the one they use
+#The calculation is at LL
+
+
+parameters = {'alpha' : 1/129,
+              'sin_theta_w**2' : 0.23,
+              'beta_0' : 23/3,
+              'beta_1' : 116/3,
+              'Lambda' : 0.225,
+              'alpha_s_Mz' : 0.117,  # \pm 0.007
+              'M_w' : 80} 
+
+
+
+def alpha_s(scale, order):   #from Buras arXiv:hep-ph/9806471 pg.47
+    if order == 'LL' :   
+        c = 0
+    if order == 'NLL':
+        c = 1
+    return (4 * np.pi)/(parameters['beta_0'] *\
+                        np.log(scale**2/parameters['Lambda']**2)) *\
+                        (1- c * (parameters['beta_1'] *\
+                             np.log(np.log(scale**2/parameters['Lambda']**2)))/\
+                         (parameters['beta_0']**2 *\
+                          np.log(scale**2/parameters['Lambda']**2)))
+    else :
+        return  'order must be LL or NLL'
+   
+
+
+def eta(mu, order):
+    return alpha_s(parameters['M_w'], order)/alpha_s(mu, order)
+
+
+def WC_1-6(mu, coefficients): #For WC=1...6 arXiv:hep-ph/9501281 eq.  2.2
+    WC_coefficients = []
+    for j in range(6):
+        for i in range(len(coefficients)):
+            WC[j] += coefficients['k1'][i] *\
+                     eta^{coefficients['a'][i]}
+    return WC
+    
+
