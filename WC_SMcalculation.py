@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 #Analytical expression for the WC C_1-C_10 in the decay B-> Xs l^+l^-
 #Mostly taken from Buras, Muenz  arXiv:hep-ph/9501281
 #The operator basis is the same as the one they use
-#The calculation is at LL for C_1-C_6 and NLL for C_9
+#The calculation is at LL for C_1-C_6 and NLL for C_9.
 
 
 
@@ -17,7 +17,6 @@ parameters = {'alpha' : 1/129,
               'beta_0' : 23/3,
               'beta_1' : 116/3,
               'Lambda' : 0.225,
-              'alpha_s_Mz' : 0.118,  # \pm 0.005
               'M_w' : 80,
               'm_t' : 170,
               'm_b' : 4.8,
@@ -52,6 +51,7 @@ coefficients = {'a' : [14/23, 16/23, 6/23, -12/23, 0.4086,\
 
 
 
+#Definition of alpha_s(mu), at LL and NLL.
 
 def alpha_s(scale, order):   #from Buras arXiv:hep-ph/9806471 pg.47
     if order == 'LL' :   
@@ -73,70 +73,64 @@ def eta(mu, order):
 
 
 
-
-def A(x):
-    return  x * (8 * x**2 + 5 * x -7)/(12 * (x-1)**3) +\
-                   x**2 * (2 - 3 * x) * np.log(x)/(2 * (x-1)**4)
+#Function needed for the loop integrals, x is the ratio of the mass
+#  of the quark running into the loop and M_W.
 
 
 
-
-def B(x):
-    return  x/(4 * (1-x)) +\
-                  x * np.log(x)/(4 * (x - 1)**2)
+x =  parameters['m_t']**2/parameters['M_w']**2
 
 
-
-
-def C(x):
-    return  x * (x - 6)/(8 * (x-1)) +\
-                   x * (3 * x + 2) * np.log(x)/(8 * (x - 1)**2)
+A =  x * (8 * x**2 + 5 * x -7)/(12 * ((x-1)**3)) +\
+     x**2 * (2 - 3 * x) * np.log(x)/(2 * (x-1)**4)
 
 
 
 
-def D(x):
-    return  (-19 * x**3 + 25 * x**2)/\
-        (36 * (x - 1)**3) + (x **2 * (5 * x**2 - 2 * x - 6)) *\
-        np.log(x)/(18 * (x - 1)**4) - 4/9 * np.log(x)
+B = x/(4 * (1-x)) +\
+    x * np.log(x)/(4 * ((x - 1)**2))
+
+
+
+C =  x * (x - 6)/(8 * (x-1)) +\
+     x * (3 * x + 2) * np.log(x)/(8 * ((x - 1)**2))
+
+
+
+D =  (-19 * x**3 + 25 * x**2)/\
+     (36 * (x - 1)**3) + (x **2 * (5 * x**2 - 2 * x - 6)) *\
+     np.log(x)/(18 * (x - 1)**4) - 4/9 * np.log(x)
+
+
+
+E = x * (18 - 11 * x - x **2)/\
+    (12 * (1 - x)**3) + (x **2 * (15 - 16 * x + 4 * x**2)) *\
+    np.log(x)/ (6 * (1 - x)**4) - 2/3 * np.log(x)
+
+
+
+F = x * (x**2 - 5 * x -2)/(4 * (x - 1)**3) +\
+    3 * x**2 * np.log(x)/(2 * (x - 1)**4)
+
+
+
+C_7 =  -1/2 * A
+
+
+
+C_8 = -1/2 * F
 
 
 
 
-def E(x):
-    return  x * (18 - 11 * x - x **2)/\
-        (12 * (1 - x)**3) + (x **2 * (15 - 16 * x + 4 * x**2)) *\
-        np.log(x)/ (6 * (1 - x)**4) - 2/3 * np.log(x)
-
-
-
-
-
-def F(x):
-    return  x * (x**2 - 5 * x -2)/(4 * (x - 1)**3) +\
-                  3 * x**2 * np.log(x)/(2 * (x - 1)**4)
-
-
-
-
-def C_7(x):
-    return -1/2 * A(x)
-
-
-
-
-def C_8(x):
-    return -1/2 * F(x)
-
-
-
+#Function needed for WC9.
 
 def P_0(mu, order):
     factor1 = 0
     for i in range(len(coefficients)):
         factor1 += coefficients['p'][i] * \
-                   eta(mu, order)**(coefficients['a'][i]+1)
-    factor2 = np.pi/alpha_s(parameters['M_w'], 'NLL') *\
+                   (eta(mu, order)**(coefficients['a'][i]+1))
+    factor2 = np.pi/(alpha_s(parameters['M_w'], 'NLL')) *\
               (-0.1875 + factor1)
     factor3 = 0
     for i in range(len(coefficients)):
@@ -144,7 +138,6 @@ def P_0(mu, order):
                    coefficients['s'][i] * eta(mu, order)) *\
                    eta(mu, order)**coefficients['a'][i]
     return factor2 + 1.2468 + factor3
-
 
 
 
@@ -160,6 +153,7 @@ def P_E(mu, order):
 
 
 
+#Definiiton of the WC.
 
 def WC1_6(mu, order): #For WC=1...6 arXiv:hep-ph/9501281 eq.  2.2
     WC_coefficients = [0]*6
@@ -172,9 +166,9 @@ def WC1_6(mu, order): #For WC=1...6 arXiv:hep-ph/9501281 eq.  2.2
 
 
 
-def WC7_eff(mu, order, x):
-    factor1 = eta(mu, order)**(16/23) * C_7(x) + 8/3 *\
-              (eta(mu, order)**(14/23)- eta(mu, order)**(16/24)) * C_8(x)
+def WC7_eff(mu, order):
+    factor1 = eta(mu, order)**(16/23) * C_7 + 8/3 *\
+              (eta(mu, order)**(14/23)- eta(mu, order)**(16/24)) * C_8
     factor2 = 0
     for i in range(len(coefficients)):
         factor2 += coefficients['h'][i] * eta(mu, order)**(coefficients['a'][i])
@@ -184,22 +178,20 @@ def WC7_eff(mu, order, x):
 #WC8_eff doesn't enter at this level of accuracy rXiv:hep-ph/9501281 pg. 4
 
 
-def WC10(x):
-    return parameters['alpha']/(2 * np.pi) *\
-        (B(x) - C(x))/parameters['sin_theta_w**2']
+WC10 = parameters['alpha']/(2 * np.pi) *\
+       (B - C)/parameters['sin_theta_w**2']
 
 
 
-#including NLL order
-def C_9(mu, order, x):
-   return  P_0(mu, order) + (C(x) - B(x))/parameters['sin_theta_w**2'] -\
-       4 * (C(x) + 1/4 * D(x)) + P_E(mu, order) * E(x)
+#WC9 must include NLL order corrections arXiv:hep-ph/9501281 pg. 7 and
+# arXiv:hep-ph/9806471 pg. 124.
+
+def C_9(mu, order):
+   return  P_0(mu, order) + (C - B)/parameters['sin_theta_w**2'] -\
+       4 * (C + 1/4 * D) + P_E(mu, order) * E
 
 
 
-def WC9(mu, order, x):
-    return parameters['alpha']/(2 * np.pi) * C_9(mu, order, x)
-
-
-x =  parameters['m_t']**2/parameters['M_w']**2
+def WC9(mu, order):
+    return parameters['alpha']/(2 * np.pi) * C_9(mu, order)
 
