@@ -17,7 +17,7 @@ parameters = {'alpha' : 1/129,
               'sin_theta_w**2' : 0.23,
               'beta_0' : 23/3,
               'beta_1' : 116/3,
-              'Lambda' : 0.225,
+              'Lambda' : 0.140,
               'M_w' : 80,
               'm_t' : 170,
               'm_b' : 4.8,
@@ -128,13 +128,13 @@ C_8 = -1/2 * F
 
 def P_0(mu):
     factor1 = 0
-    for i in range(len(coefficients)):
+    for i in range(len(coefficients['r'])):
         factor1 += coefficients['p'][i] * \
                    (eta(mu, 'NLL')**(coefficients['a'][i]+1))
     factor2 = np.pi/(alpha_s(parameters['M_w'], 'NLL')) *\
               (-0.1875 + factor1)
     factor3 = 0
-    for i in range(len(coefficients)):
+    for i in range(len(coefficients['r'])):
         factor3 += (coefficients['r'][i] + \
                    coefficients['s'][i] * eta(mu, 'NLL')) *\
                    eta(mu, 'NLL')**coefficients['a'][i]
@@ -144,7 +144,7 @@ def P_0(mu):
 
 def P_E(mu):
     factor = 0
-    for i in range(len(coefficients)):
+    for i in range(len(coefficients['r'])):
         factor += coefficients['q'][i] * \
                    eta(mu, 'NLL')**(coefficients['a'][i]+1)
     return 0.1405 + factor
@@ -214,7 +214,7 @@ def eta_tilde(mu, q):
 def WC1_6(mu): #returns a list with WC1 - WC6 
     WC_coefficients = [0]*6
     for j in range(len(WC_coefficients)):
-        for i in range(len(coefficients)):
+        for i in range(len(coefficients['r'])):
             WC_coefficients[j] += coefficients['k'][j][i] *\
                      eta(mu, 'LL')**(coefficients['a'][i])
     return WC_coefficients
@@ -225,7 +225,7 @@ def WC7_eff(mu):
     factor1 = eta(mu, 'LL')**(16/23) * C_7 + 8/3 *\
               (eta(mu, 'LL')**(14/23)- eta(mu, 'LL')**(16/24)) * C_8
     factor2 = 0
-    for i in range(len(coefficients)):
+    for i in range(len(coefficients['r'])):
         factor2 += coefficients['h'][i] *\
                    eta(mu, 'LL')**(coefficients['a'][i])
     return factor1 + factor2
