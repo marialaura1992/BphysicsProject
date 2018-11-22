@@ -14,12 +14,12 @@ import scipy.integrate as integrate
 
 
 parameters = {'alpha' : 1/129,
-              'sin_theta_w**2' : 0.23,
+              'sin_theta_w**2' : 0.23124,
               'beta_0' : 23/3,
               'beta_1' : 116/3,
-              'Lambda' : 0.140,
-              'M_w' : 80,
-              'm_t' : 170,
+              'Lambda' : 0.225,
+              'M_w' : 80.41,
+              'm_t' : 173.8,
               'm_b' : 4.8,
               'm_c' : 1.4
 }
@@ -216,18 +216,18 @@ def WC1_6(mu): #returns a list with WC1 - WC6
     for j in range(len(WC_coefficients)):
         for i in range(len(coefficients['r'])):
             WC_coefficients[j] += coefficients['k'][j][i] *\
-                     eta(mu, 'LL')**(coefficients['a'][i])
+                     eta(mu, 'NLL')**(coefficients['a'][i])
     return WC_coefficients
 
 
 
 def WC7_eff(mu):
-    factor1 = eta(mu, 'LL')**(16/23) * C_7 + 8/3 *\
-              (eta(mu, 'LL')**(14/23)- eta(mu, 'LL')**(16/24)) * C_8
+    factor1 = eta(mu, 'NLL')**(16/23) * C_7 + 8/3 *\
+              (eta(mu, 'NLL')**(14/23)- eta(mu, 'NLL')**(16/24)) * C_8
     factor2 = 0
     for i in range(len(coefficients['r'])):
         factor2 += coefficients['h'][i] *\
-                   eta(mu, 'LL')**(coefficients['a'][i])
+                   eta(mu, 'NLL')**(coefficients['a'][i])
     return factor1 + factor2
 
 
@@ -266,3 +266,4 @@ def WC9_eff(mu, q):
     return factor1 + factor2 + factor3 + factor4
 
 
+print(WC10 * 2 * np.pi * 129)
