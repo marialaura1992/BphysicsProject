@@ -21,7 +21,7 @@ Central_Coefficients = np.array([
     [0.31, 0.50, 1.61],  #T2
     [0.67, 1.32, 3.82]])  #T23
 
-
+'''
 #Coefficients uncertainties
 
 Delta_Coefficients = np.array([
@@ -32,7 +32,7 @@ Delta_Coefficients = np.array([
     [0.03, 0.19, 1.64],  #T1
     [0.03, 0.17, 0.80],  #T2
     [0.06, 0.22, 2.20]]) #23
-
+'''
 
 
 Masses = {'m_B' : 5.279,
@@ -72,17 +72,10 @@ def z(q):
 #'up' for positive uncertainty
 #'down' for negative uncertainty
 
-def FF(q, value, sign):
-    if value == 'central' and sign == '-':
-        Coefficients = Central_Coefficients
-    elif value == 'limit' and sign == 'up':
-        Coefficients = Central_Coefficients +\
-                       Delta_Coefficients
-    elif value == 'limit' and sign == 'down':
-        Coefficients = Central_Coefficients -\
-                       Delta_Coefficients
-    else:
-        return('Error')
+
+q = np.arange(0, 20, 0.1)
+
+def FF(q, Coefficients):
     res = np.zeros((len(q), len(Coefficients)))
     for k in range(len(q)):
         for i in range(len(Coefficients)):
@@ -92,8 +85,6 @@ def FF(q, value, sign):
                         (z(q[k]) - z(0))**j
             res[k][i] = P(q[k])[i] * res1
     return res
-
-q = np.arange(0, 20, 0.1)
 
 
 #print('in 0 ', FF([0], 'central', '-'), '\n')
@@ -107,15 +98,15 @@ q = np.arange(0, 20, 0.1)
 #print(FF(q, 'central', '-'))
 #print(len(FF(q, 'central', '-')))
 #print(FF(q, 'central', '-').reshape(len(q), len(Central_Coefficients))[0])
-ff = ['V', 'A1', 'A12', 'T1', 'T2', 'T12']
+#ff = ['V', 'A1', 'A12', 'T1', 'T2', 'T12']
 
-
+'''
 rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
-plt.plot(q, FF(q, 'central', '-')[:,6], 'b--', label = 'LCSM + Lattice')
+plt.plot(q, FF(q, Central_Coefficients)[:,6], 'b--', label = 'LCSM + Lattice')
 plt.xlabel('$q^2$')
 plt.ylabel('$T_{12} (q^2)$')
 plt.legend()
 plt.gca().set_ylim([0,1.5])
 plt.show()
-
+'''
