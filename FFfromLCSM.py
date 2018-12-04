@@ -21,22 +21,9 @@ Central_Coefficients = np.array([
     [0.31, 0.50, 1.61],  #T2
     [0.67, 1.32, 3.82]])  #T23
 
-'''
-#Coefficients uncertainties
 
-Delta_Coefficients = np.array([
-    [0.03, 0.26, 1.63],  #A0
-    [0.03, 0.19, 1.03],  #A1
-    [0.02, 0.13, 0.66],  #A12
-    [0.03, 0.26, 1.53],  #V
-    [0.03, 0.19, 1.64],  #T1
-    [0.03, 0.17, 0.80],  #T2
-    [0.06, 0.22, 2.20]]) #23
-'''
-
-
-Masses = {'m_B' : 5.279,
-          'm_K*' : 0.895,
+Masses = {'m_B' : 5.27963,
+          'm_K*' : 0.89555,
           'm_R' : [5.366, 5.829, 5.829, \
                    5.415, 5.415, 5.829, 5.829]
 }
@@ -67,43 +54,31 @@ def z(q):
     return factor1/factor2
 
 
-#value can be 'central' or 'limit' while
-#sign can be '-' for the central value
-#'up' for positive uncertainty
-#'down' for negative uncertainty
+#q = np.arange(0, 20, 0.1)
 
-
-q = np.arange(0, 20, 0.1)
-
-def FF(q, Coefficients):
-    res = np.zeros((len(q), len(Coefficients)))
+def FF(q):
+    res = np.zeros((len(q), len(Central_Coefficients)))
     for k in range(len(q)):
-        for i in range(len(Coefficients)):
+        for i in range(len(Central_Coefficients)):
             res1 = 0
-            for j in range(len(Coefficients[0])):
-                res1 += Coefficients[i][j] * \
+            for j in range(len(Central_Coefficients[0])):
+                res1 += Central_Coefficients[i][j] * \
                         (z(q[k]) - z(0))**j
             res[k][i] = P(q[k])[i] * res1
     return res
 
-
-#print('in 0 ', FF([0], 'central', '-'), '\n')
-
-#print('in 1 ', FF([1], 'central', '-'), '\n')
-
-#print('in 2 ', FF([2], 'central', '-'), '\n')
-
-#print(FF(19.9, 'central', '-'), '\n')
-
-#print(FF(q, 'central', '-'))
-#print(len(FF(q, 'central', '-')))
-#print(FF(q, 'central', '-').reshape(len(q), len(Central_Coefficients))[0])
-#ff = ['V', 'A1', 'A12', 'T1', 'T2', 'T12']
+def DcoeffFF(q):
+    res = np.zeros((len(q), len(Central_Coefficients), len(Central_Coefficients[0])))
+    for k in range(len(q)): 
+        for i in range(len(Central_Coefficients)): #7
+            for j in range(len(Central_Coefficients[0])): #3
+                res[k][i][j] = (z(q[k]) - z(0))**j * P(q[k])[i]
+    return res
 
 '''
 rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
-plt.plot(q, FF(q, Central_Coefficients)[:,6], 'b--', label = 'LCSM + Lattice')
+plt.plot(q, FF(q)[:,0], 'b--', label = 'LCSM + Lattice')
 plt.xlabel('$q^2$')
 plt.ylabel('$T_{12} (q^2)$')
 plt.legend()

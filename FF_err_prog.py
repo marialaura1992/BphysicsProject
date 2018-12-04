@@ -58,21 +58,37 @@ variance_matrix = np.zeros((21,21))
 for i in range(len(sigma_matrix)):
     for j in range(len(sigma_matrix)):
         variance_matrix[i,j] = corr_matrix[i,j] * sigma_matrix[i,j]
+        
 
+q = np.arange(0, 20, 0.5)
 
-q = np.arange(0, 2, 1)
-
-def DeltaFF(q):
-    deltaFF = np.zeros((len(q), 7))
+#n specify which FF we want
+#0 = A0, 1=A1 ...
+def DeltaFF(q, n):
+    deltaFF = np.zeros(len(q))
     for z in range(len(q)):
-        for i in range(7):
-            res = 0
-            for j in range(3):
-                for k in range(3):
-                    res += FFfromLCSM.DcoeffFF(q)[z, i, j] * variance_matrix[j,k] * FFfromLCSM.DcoeffFF(q)[z, i, k]
-                    print(res)
-            deltaFF[z,i] = np.sqrt(res)
+        res = np.dot(variance_matrix[3*n : 3*n+3, 3*n : 3*n+3],\
+          FFfromLCSM.DcoeffFF(q)[z, n, :])
+        res1 = np.dot(np.transpose(FFfromLCSM.DcoeffFF(q)[z, n, :]), res)
+        deltaFF[z] =  np.sqrt(res1)
+    return(deltaFF)
 
-print(DeltaFF(q))
-    
+
+def FFplusDFF(q, n):
+    return(DeltaFF(q, n) + FFfromLCSM.FF(q)[:, n])
+
+
+def FFminusDFF(q, n):
+    return(FFfromLCSM.FF(q)[:, n] - DeltaFF(q, n))
+
+
+rc('font',**{'family':'serif','serif':['Palatino']})
+rc('text', usetex=True)
+plt.plot(q, FFplusDFF(q, 0))
+plt.plot(q, FFminusDFF(q, 0))
+plt.xlabel('$q^2$')
+plt.ylabel('$A_{0} (q^2)$')
+plt.show()
+
+
     
