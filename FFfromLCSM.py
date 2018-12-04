@@ -56,22 +56,22 @@ def z(q):
 
 #q = np.arange(0, 20, 0.1)
 
-def FF(q):
-    res = np.zeros((len(q), len(Central_Coefficients)))
+def FF(q, coefficients):
+    res = np.zeros((len(q), len(coefficients)))
     for k in range(len(q)):
-        for i in range(len(Central_Coefficients)):
+        for i in range(len(coefficients)):
             res1 = 0
-            for j in range(len(Central_Coefficients[0])):
-                res1 += Central_Coefficients[i][j] * \
+            for j in range(len(coefficients[0])):
+                res1 += coefficients[i][j] * \
                         (z(q[k]) - z(0))**j
             res[k][i] = P(q[k])[i] * res1
     return res
 
-def DcoeffFF(q):
-    res = np.zeros((len(q), len(Central_Coefficients), len(Central_Coefficients[0])))
+def DcoeffFF(q, coefficients):
+    res = np.zeros((len(q), len(coefficients), len(coefficients[0])))
     for k in range(len(q)): 
-        for i in range(len(Central_Coefficients)): #7
-            for j in range(len(Central_Coefficients[0])): #3
+        for i in range(len(coefficients)): #7
+            for j in range(len(coefficients[0])): #3
                 res[k][i][j] = (z(q[k]) - z(0))**j * P(q[k])[i]
     return res
 

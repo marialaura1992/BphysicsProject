@@ -6,6 +6,15 @@ from matplotlib import rc
 import FFfromLCSM, os, json
 from pprint import pprint
 
+Central_Coefficients = np.array([
+    [0.37, -1.37, 0.13], #A0
+    [0.30, 0.39, 1.19],  #A1
+    [0.27, 0.53, 0.48],  #A12
+    [0.38, -1.17, 2.42], #V
+    [0.31, -1.01, 1.53], #T1
+    [0.31, 0.50, 1.61],  #T2
+    [0.67, 1.32, 3.82]])  #T23
+
 
 with open('corr.json') as data_file:
     corr = json.load(data_file)
@@ -68,27 +77,40 @@ def DeltaFF(q, n):
     deltaFF = np.zeros(len(q))
     for z in range(len(q)):
         res = np.dot(variance_matrix[3*n : 3*n+3, 3*n : 3*n+3],\
-          FFfromLCSM.DcoeffFF(q)[z, n, :])
-        res1 = np.dot(np.transpose(FFfromLCSM.DcoeffFF(q)[z, n, :]), res)
+          FFfromLCSM.DcoeffFF(q, Central_Coefficients)[z, n, :])
+        res1 = np.dot(np.transpose(FFfromLCSM.DcoeffFF(q, Central_Coefficients)[z, n, :]), res)
         deltaFF[z] =  np.sqrt(res1)
     return(deltaFF)
 
 
 def FFplusDFF(q, n):
-    return(DeltaFF(q, n) + FFfromLCSM.FF(q)[:, n])
+    return(DeltaFF(q, n) + FFfromLCSM.FF(q, Central_Coefficients)[:, n])
 
 
 def FFminusDFF(q, n):
-    return(FFfromLCSM.FF(q)[:, n] - DeltaFF(q, n))
+    return(FFfromLCSM.FF(q, Central_Coefficients)[:, n] - DeltaFF(q, n))
 
 
-rc('font',**{'family':'serif','serif':['Palatino']})
-rc('text', usetex=True)
-plt.plot(q, FFplusDFF(q, 0))
-plt.plot(q, FFminusDFF(q, 0))
-plt.xlabel('$q^2$')
-plt.ylabel('$A_{0} (q^2)$')
-plt.show()
+
+for i in range(7):
+    FFmax = FFplusDFF(q, i)[:]
+    FFmin = FFminusDFF(q, i)[:]
+    
+    rc('font',**{'family':'serif','serif':['Palatino']})
+    rc('text', usetex=True)
+    plt.plot(q, FFmax, 'b', label = 'LCSM+Lattice')
+    plt.plot(q, FFmin, 'b')
+    plt.fill_between(q, FFmax, FFmin, color='blue', alpha='0.3')
+    FFnames = np.array(['A_0', 'A_1', 'A_12', 'V', 'T_1', 'T_2', 'T_23' ])
+    plt.xlabel('$q^2$')
+    plt.ylabel('${}(q^2)$'.format(FFnames[i]))
+    plt.legend()
+    plt.gca().set_ylim([0, 2])
+    pathname = 'Figure/ErrorPropWithCorr/{}.png'.format(FFnames[i])
+    if os.path.isfile(pathname):
+        os.remove(pathname)
+    plt.savefig(pathname, bbox_inches='tight')
+    plt.clf()
 
 
     

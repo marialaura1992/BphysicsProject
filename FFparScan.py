@@ -10,7 +10,6 @@ import FFfromLCSM, os
 
 q = np.arange(0, 20, 0.5)
 
-
 #Coefficients uncertainties
 
 Uncertainties = np.array([
@@ -37,6 +36,10 @@ CentralCoeff = np.array([
 #Loop over all the FFs, to estimate the max and min
 #values. No correlation between coefficients a_1, a_2, a_3.
 #Simple parameter space scan.
+
+
+FFcentralEval = FFfromLCSM.FF([5], CentralCoeff)
+
 
 for i in range(len(Uncertainties)):
     MaxCoeff = CentralCoeff[i] + Uncertainties[i]
@@ -90,6 +93,7 @@ for i in range(len(Uncertainties)):
     Fmax = MaxValue[:]
     Fmin = MinValue[:]
     Fcentral = FFcentralEval[:,i]
+
     
     #Make the plot.
     rc('font',**{'family':'serif','serif':['Palatino']})
@@ -103,9 +107,9 @@ for i in range(len(Uncertainties)):
     plt.ylabel('${}(q^2)$'.format(FFnames[i]))
     plt.legend()
     plt.gca().set_ylim([0, 2])
-    pathname = 'Figure/{}.png'.format(FFnames[i])
+    pathname = 'Figure/ParSpaceNoCorr/{}.png'.format(FFnames[i])
     if os.path.isfile(pathname):
         os.remove(pathname)
     plt.savefig(pathname, bbox_inches='tight')
     plt.clf()
-   
+
